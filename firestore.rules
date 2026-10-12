@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+    function isNewDocOwner() {
+      return isAuthenticated() && request.auth.uid == request.resource.data.userId;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+
+    // Courses (Old path - keeping for compatibility if needed, but we'll use the new one)
+    match /courses/{courseId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && isNewDocOwner();
+      allow update: if isAuthenticated() && isDocOwner();
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
+
+    // User-specific courses (New path)
+    match /users/{userId}/courses/{courseId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Evaluations
+    match /evaluations/{evaluationId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isNewDocOwner();
+      allow update, delete: if isAuthenticated() && isDocOwner();
+    }
+
+    // Connection test path
+    match /_connection_test_/{docId} {
+      allow read: if true;
+    }
+  }
+}

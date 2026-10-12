@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "users": {
+      "title": "User",
+      "description": "User profile and progress tracking.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "name": { "type": "string", "description": "User's full name" },
+        "email": { "type": "string", "format": "email", "description": "User's email" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp" }
+      },
+      "required": ["uid", "name", "email"]
+    },
+    "courses": {
+      "title": "Course",
+      "description": "A generated course for a specific topic.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner of the course" },
+        "topic": { "type": "string", "description": "Main topic of the course" },
+        "skillLevel": { "type": "string", "enum": ["Beginner", "Intermediate", "Advanced"] },
+        "lessons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "videoId": { "type": "string" },
+              "completed": { "type": "boolean" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "topic", "skillLevel", "lessons"]
+    },
+    "evaluations": {
+      "title": "Evaluation",
+      "description": "Results of user evaluations (quizzes, tasks, projects, interviews).",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "lessonId": { "type": "string" },
+        "type": { "type": "string", "enum": ["quiz", "task", "project", "interview"] },
+        "score": { "type": "number" },
+        "feedback": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "lessonId", "type", "score"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "User profiles"
+    },
+    "/courses/{courseId}": {
+      "schema": "courses",
+      "description": "Generated courses"
+    },
+    "/evaluations/{evaluationId}": {
+      "schema": "evaluations",
+      "description": "Evaluation results"
+    }
+  }
+}

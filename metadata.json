@@ -1,0 +1,7 @@
+{
+  "name": "Personalized Video-Based Learning and Evaluation Platform",
+  "description": "A full-stack platform that generates custom courses from YouTube videos and evaluates user progress using AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
